@@ -109,7 +109,7 @@ runs:
       with:
         body: ${{ steps.git-cliff-partial.outputs.content }}
         tag_name: ${{ steps.git-cliff-partial.outputs.version }}
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ inputs.GITHUB_TOKEN }}
         prerelease: false
         draft: false
         make_latest: true
