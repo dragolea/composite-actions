@@ -83,7 +83,6 @@ runs:
       id: git-cliff-partial
       if: steps.tag.conclusion == 'success'
       uses: orhun/git-cliff-action@v3
-      run: echo "Generated partial CHANGELOG.md."
       with:
         config: cliff.toml
         args: -vv --latest --strip header
@@ -131,7 +130,6 @@ runs:
       id: create-pull-request
       if: steps.move-log.conclusion == 'success'
       uses: peter-evans/create-pull-request@v5
-      run: echo "Created a pull request to update version and changelog."
       with:
         branch: feature-version-bump
         title: 'chore: update version and changelog'
