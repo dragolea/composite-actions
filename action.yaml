@@ -30,6 +30,12 @@ runs:
       with:
         node-version: '20'
 
+    - name: Install dependencies
+      # id: install-dependencies
+      if: steps.setup-node.conclusion == 'success'
+      run: npm install -g @dxfrontier/sync-mta-version
+      shell: bash
+
     - name: Determine version bump type
       id: version-bump-type
       env:
