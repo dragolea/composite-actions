@@ -154,5 +154,6 @@ runs:
         branch: feature-version-bump
         title: 'chore: update version and changelog'
         body: 'This PR updates the version and changelog.'
-        base: dev
+        # TODO: change this to the dev or main later
+        base: main
         labels: deploy
