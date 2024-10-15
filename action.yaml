@@ -72,7 +72,6 @@ runs:
       id: tag
       if: steps.update-manifest-version.conclusion == 'success'
       uses: anothrNick/github-tag-action@v1
-      run: echo "Pushed git tag for the new version."
       env:
         GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
         WITH_V: false
