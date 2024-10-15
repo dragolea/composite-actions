@@ -57,7 +57,6 @@ runs:
       id: package-version
       if: steps.update-package-version.conclusion == 'success'
       uses: martinbeentjes/npm-get-version-action@v1.3.1
-      run: echo "Retrieved the updated npm version."
 
     - name: Apply version bump to package.json, /app/*/package.json, /app/*/webapp/manifest.json
       id: update-package-version
