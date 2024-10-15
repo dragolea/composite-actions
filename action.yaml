@@ -28,9 +28,9 @@ runs:
       id: setup-node
       if: steps.code-checkout.conclusion == 'success'
       uses: actions/setup-node@v4
-      run: echo "Node.js 20.x set up successfully."
       with:
         node-version: '20'
+      shell: bash
 
     - name: Determine version bump type
       id: version-bump-type
