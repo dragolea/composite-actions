@@ -19,28 +19,18 @@ runs:
         contains(github.event.pull_request.labels.*.name, 'version: patch') ||
         contains(github.event.pull_request.labels.*.name, 'version: minor') ||
         contains(github.event.pull_request.labels.*.name, 'version: major')
-      run: echo "Proceed versioning"
+      run: |
+        echo "Labels found for versioning. Proceeding with version bump."
+        echo "Proceed versioning."
       shell: bash
-
-    - name: Checkout code
-      id: code-checkout
-      if: steps.proceed-versioning.conclusion == 'success'
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
 
     - name: Set up Node.js 20.x
       id: setup-node
       if: steps.code-checkout.conclusion == 'success'
       uses: actions/setup-node@v4
+      run: echo "Node.js 20.x set up successfully."
       with:
         node-version: '20'
-
-    # - name: Install dependencies
-    #   id: install-dependencies
-    #   if: steps.setup-node.conclusion == 'success'
-    #   run: npm install -g @dxfrontier/sync-mta-version
-    #   shell: bash
 
     - name: Determine version bump type
       id: version-bump-type
@@ -68,19 +58,23 @@ runs:
       id: package-version
       if: steps.update-package-version.conclusion == 'success'
       uses: martinbeentjes/npm-get-version-action@v1.3.1
+      run: echo "Retrieved the updated npm version."
 
     - name: Apply version bump to package.json, /app/*/package.json, /app/*/webapp/manifest.json
       id: update-package-version
       if: >
         steps.version-bump-type.conclusion == 'success' &&
         env.VERSION_BUMP
-      run: npx @dxfrontier/sync-mta-version -f mta.yaml -u /app
+      run: |
+        echo "Applying version bump to package.json and manifest.json files."
+        npx @dxfrontier/sync-mta-version -f mta.yaml -u /app
       shell: bash
 
     - name: Push git tag
       id: tag
       if: steps.update-manifest-version.conclusion == 'success'
       uses: anothrNick/github-tag-action@v1
+      run: echo "Pushed git tag for the new version."
       env:
         GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
         WITH_V: false
@@ -92,6 +86,7 @@ runs:
       id: git-cliff-partial
       if: steps.tag.conclusion == 'success'
       uses: orhun/git-cliff-action@v3
+      run: echo "Generated partial CHANGELOG.md."
       with:
         config: cliff.toml
         args: -vv --latest --strip header
@@ -104,6 +99,7 @@ runs:
       id: create-release
       if: steps.git-cliff-partial.conclusion == 'success'
       uses: softprops/action-gh-release@v2
+      run: echo "Published GitHub release."
       env:
         GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
       with:
@@ -119,6 +115,7 @@ runs:
       id: git-cliff
       if: steps.create-release.conclusion == 'success'
       uses: orhun/git-cliff-action@v3
+      run: echo "Generated final CHANGELOG.md."
       with:
         config: cliff.toml
         args: --verbose
@@ -139,6 +136,7 @@ runs:
       id: create-pull-request
       if: steps.move-log.conclusion == 'success'
       uses: peter-evans/create-pull-request@v5
+      run: echo "Created a pull request to update version and changelog."
       with:
         branch: feature-version-bump
         title: 'chore: update version and changelog'
