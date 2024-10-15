@@ -96,7 +96,6 @@ runs:
       id: create-release
       if: steps.git-cliff-partial.conclusion == 'success'
       uses: softprops/action-gh-release@v2
-      run: echo "Published GitHub release."
       env:
         GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
       with:
@@ -112,7 +111,6 @@ runs:
       id: git-cliff
       if: steps.create-release.conclusion == 'success'
       uses: orhun/git-cliff-action@v3
-      run: echo "Generated final CHANGELOG.md."
       with:
         config: cliff.toml
         args: --verbose
