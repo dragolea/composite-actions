@@ -6,7 +6,7 @@ inputs:
     required: true
 
 runs:
-  using: composite
+  using: 'composite'
   steps:
     - name: Pull request merged
       if: github.event.pull_request.merged == true
@@ -14,7 +14,6 @@ runs:
       shell: bash
 
     - name: Check labels to proceed versioning
-      id: proceed-versioning
       if: >
         contains(github.event.pull_request.labels.*.name, 'version: patch') ||
         contains(github.event.pull_request.labels.*.name, 'version: minor') ||
@@ -30,14 +29,12 @@ runs:
         fetch-depth: 0
 
     - name: Set up Node.js 20.x
-      id: setup-node
       uses: actions/setup-node@v4
       with:
         node-version: '20'
 
     - name: Install dependencies
       # id: install-dependencies
-      if: steps.setup-node.conclusion == 'success'
       run: npm install -g @dxfrontier/sync-mta-version
       shell: bash
 
@@ -62,17 +59,22 @@ runs:
         fi
       shell: bash
 
-    - name: 'Automated: version bump (package.json)'
-      id: version-bump
-      uses: phips28/gh-action-bump-version@v11.0.0
+    - name: Create pull request
+      id: create-pull-request
+      # if: steps.move-log.conclusion == 'success'
+      uses: peter-evans/create-pull-request@v5
       with:
-        version-type: ${{ env.VERSION_BUMP }}
-        minor-wording: minor
-        major-wording: major
-        patch-wording: patch
-        skip-tag: true
-      env:
-        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+        branch: feature-version-bump
+        title: 'chore: update version and changelog'
+        body: 'This PR updates the version and changelog.'
+        # TODO: change this to the dev or main later
+        base: main
+        labels: deploy
+
+    - name: Bump version to package.json
+      id: version-bump
+      run: npm version ${{ env.VERSION_BUMP }} --no-git-tag-version
+      shell: bash
 
     - name: Apply version bump to package.json, /app/*/package.json, /app/*/webapp/manifest.json
       id: update-package-version
@@ -95,7 +97,7 @@ runs:
       env:
         GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
         WITH_V: false
-        CUSTOM_TAG: ${{  steps.package-version.outputs.current-version }}
+        CUSTOM_TAG: ${{ steps.package-version.outputs.current-version}}
         BRANCH_HISTORY: full
 
     # Generate the changelog file using the configuration from cliff.toml.
@@ -145,15 +147,3 @@ runs:
         rm ./git-cliff/CHANGELOG.md
         rmdir ./git-cliff/
       shell: bash
-
-    - name: Create pull request
-      id: create-pull-request
-      # if: steps.move-log.conclusion == 'success'
-      uses: peter-evans/create-pull-request@v5
-      with:
-        branch: feature-version-bump
-        title: 'chore: update version and changelog'
-        body: 'This PR updates the version and changelog.'
-        # TODO: change this to the dev or main later
-        base: main
-        labels: deploy
