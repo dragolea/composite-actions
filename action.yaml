@@ -77,9 +77,7 @@ runs:
     - name: Apply version bump to package.json, /app/*/package.json, /app/*/webapp/manifest.json
       id: update-package-version
       if: steps.version-bump.conclusion == 'success'
-      run: |
-        echo "Applying version bump to package.json and manifest.json files."
-        sync-mta-version -f mta.yaml -u /app
+      run: sync-mta-version -f mta.yaml -u /app
       shell: bash
 
     - name: Retrieve updated npm version
