@@ -36,11 +36,11 @@ runs:
       with:
         node-version: '20'
 
-    - name: Install dependencies
-      id: install-dependencies
-      if: steps.setup-node.conclusion == 'success'
-      run: npm install -g @dxfrontier/sync-mta-version
-      shell: bash
+    # - name: Install dependencies
+    #   id: install-dependencies
+    #   if: steps.setup-node.conclusion == 'success'
+    #   run: npm install -g @dxfrontier/sync-mta-version
+    #   shell: bash
 
     - name: Determine version bump type
       id: version-bump-type
@@ -74,7 +74,7 @@ runs:
       if: >
         steps.version-bump-type.conclusion == 'success' &&
         env.VERSION_BUMP
-      run: sync-mta-version -f mta.yaml -u /app
+      run: npx @dxfrontier/sync-mta-version -f mta.yaml -u /app
       shell: bash
 
     - name: Push git tag
