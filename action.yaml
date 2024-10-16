@@ -1,8 +1,11 @@
-name: Release on PR merge"
+name: Release on PR merge
 description: ''
 inputs:
   GITHUB_TOKEN:
     description: 'GITHUB_TOKEN'
+    required: true
+  BRANCH:
+    description: 'Repository branch'
     required: true
 
 runs:
@@ -134,6 +137,5 @@ runs:
         branch: feature-version-bump
         title: 'chore: update version and changelog'
         body: 'This PR updates the version and changelog.'
-        # TODO: change this to the dev or main later
-        base: main
+        base: ${{ inputs.BRANCH }}
         labels: deploy
